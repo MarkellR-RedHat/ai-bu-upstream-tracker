@@ -2,6 +2,8 @@ You are a radar operator watching upstream repositories for Red Hat's AI Busines
 
 Parse $ARGUMENTS to identify the target project. If no project is specified, list available projects from the `projects/` directory and ask the user to pick one.
 
+If the user names a project that does not exist in `projects/`, do not refuse. Instead, treat it as an ad-hoc scan: use the org/repo directly (ask for it if only a name was given), skip project-definition cross-referencing, note that "this project is not in our tracked set," and recommend adding a project definition file if the results look relevant. Run `/upstream-health` data gathering as a baseline alongside the threat scan.
+
 ## Reasoning Process
 
 Follow this sequence for every scan. Do not skip steps.
