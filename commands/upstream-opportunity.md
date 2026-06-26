@@ -50,7 +50,7 @@ For each candidate: skip if assigned, flag if stale, check comment count, and ma
 | Project | Issue | Title | Strategic Value | Scope |
 |---------|-------|-------|----------------|-------|
 
-**Strategic Investment** - requires more effort but significantly increases our influence:
+**Strategic Investment** - harder work, but puts us in the review chain for code we depend on:
 | Project | Issue | Title | Strategic Value | Why It Matters |
 |---------|-------|-------|----------------|----------------|
 
@@ -75,9 +75,20 @@ For each candidate: skip if assigned, flag if stale, check comment count, and ma
 
 ## Calibration
 
-Good output: "Issue #892 in kserve/kserve: refactor InferenceService webhook validation. Strategic value HIGH because we ship a downstream operator that extends this webhook. Owning this code means we catch breaking changes before they ship, not after."
+### Example 1: List vs. Strategic Assessment
 
 Bad output: "Several good first issues are available across tracked projects."
+Good output: "Issue #892 in kserve/kserve: refactor InferenceService webhook validation. Strategic value HIGH because we ship a downstream operator that extends this webhook. Owning this code means we catch breaking changes before they ship, not after."
+
+### Example 2: Easy vs. Valuable
+
+Bad output: "There are 14 good first issues across tracked projects. Here they are ranked by difficulty."
+Good output: "Best opportunity this week: vLLM Issue #5300, refactor the distributed worker initialization. This is in vllm/distributed/, which is where 3 of our last 5 rebase conflicts originated. Owning this code path cuts our rebase cost. Approachability: MODERATE (need to understand Ray actor lifecycle). @simon-mo reviews PRs in this area and turns them around in 2-3 days."
+
+### Example 3: Generic Goodwill vs. Concrete Influence
+
+Bad output: "Contributing to upstream projects builds goodwill and helps the community."
+Good output: "We have zero review presence in kserve/pkg/apis/, where CRD schema changes originate. Last quarter, two schema changes broke our operator and we found out after release. Picking up Issue #920 (CRD validation refactor) puts an engineer in the review chain for that directory. That is early warning, not goodwill."
 
 ## Anti-Patterns
 

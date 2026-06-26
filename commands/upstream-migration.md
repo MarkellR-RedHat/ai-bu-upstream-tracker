@@ -81,9 +81,20 @@ How to revert, and what to check before re-attempting.
 
 ## Calibration
 
-Good output: "BC-1: model_loader parameter removed. Old: `engine = LLMEngine(model_loader="safetensors")`. New: `engine = LLMEngine(load_format="safetensors")`. Files to update: serving/config.py line 34, tests/test_engine.py line 12."
+### Example 1: Changelog Paste vs. Migration Step
 
 Bad output: "Several API parameters were renamed. See the changelog for details."
+Good output: "BC-1: model_loader parameter removed. Old: `engine = LLMEngine(model_loader="safetensors")`. New: `engine = LLMEngine(load_format="safetensors")`. Files to update: serving/config.py line 34, tests/test_engine.py line 12."
+
+### Example 2: Hand-Waving Gotchas vs. Sourced Warnings
+
+Bad output: "There may be some compatibility issues when upgrading."
+Good output: "Gotcha: the new async engine silently drops requests that exceed the new 30s timeout default (changed from 120s in v0.7). Three users reported this in Issue #4890. Workaround: set VLLM_REQUEST_TIMEOUT=120 until you audit your expected latencies. This is not in the changelog."
+
+### Example 3: Generic Plan vs. Dependency-Ordered Steps
+
+Bad output: "Update your dependencies and test thoroughly."
+Good output: "Step 1: Bump vllm in requirements.txt from 0.4.2 to 0.4.3. Do NOT update ray yet. Step 2: Apply BC-1 (model_loader rename) in serving/config.py. Step 3: Apply BC-2 (scheduler API change) in scheduler/priority.py. Step 4: Run `pytest tests/serving/` -- expect 2 new warnings about deprecated batch_size parameter. Step 5: Now bump ray to 2.10 (requires vllm 0.4.3+). Step 6: Full test suite."
 
 ## Anti-Patterns
 

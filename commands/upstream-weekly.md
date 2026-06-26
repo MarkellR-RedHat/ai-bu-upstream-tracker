@@ -40,7 +40,7 @@ This table is the single most important artifact. Someone should be able to read
 
 ### Per-Project Intelligence
 
-Only for projects with notable activity. Skip quiet ones entirely.
+Only for projects with findings that need attention. Skip quiet ones entirely.
 
 #### <Project Name> (<org/repo>)
 
@@ -67,11 +67,22 @@ If there are no real patterns this week, omit this section.
 
 ## Calibration
 
+### Example 1: Reader Does the Work vs. Briefing Does the Work
+
+Bad output: "This was an active week across the upstream ecosystem with 247 PRs merged across 10 projects. Here is a detailed breakdown of all activity organized by project..."
 Good output: "Quiet week across most projects. One item needs attention: vLLM merged a memory allocator change that breaks our direct allocate() calls. See ACT NOW below. Everything else is routine."
 
-Bad output: "This was an active week across the upstream ecosystem with 247 PRs merged across 10 projects. Here is a comprehensive breakdown of all activity organized by project..."
-
 The good version tells the reader whether to care. The bad version makes them do the work.
+
+### Example 2: Activity Log vs. Threat Briefing
+
+Bad output: "vLLM: 34 PRs merged. Ray: 12 PRs merged. KServe: 8 PRs merged. InstructLab: 15 PRs merged."
+Good output: "Two items this week. First: vLLM dropped the --model-loader flag (PR #17289) and our Dockerfile still uses it -- fix before the next image build. Second: KServe opened an RFC to restructure InferenceService CRD fields (Issue #3400). No action yet, but this will affect our operator if it lands. Everything else was routine."
+
+### Example 3: Fake Cross-Project Pattern vs. Real One
+
+Bad output: "Multiple projects saw increased activity this week, suggesting a general trend toward more development."
+Good output: "Both vLLM (PR #5200) and Ray Serve (PR #38100) bumped their minimum Python to 3.10. Our base images still ship 3.9. This blocks upgrades to both projects until we rebuild base images."
 
 ## Anti-Patterns
 

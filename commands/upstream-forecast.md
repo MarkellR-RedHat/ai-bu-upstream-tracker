@@ -23,9 +23,20 @@ For each predicted change, assign:
 
 ## Calibration
 
-Good output: "Three maintainers discussed moving to async-first architecture in issue #4521. Draft PR #4600 implements the first phase. If this lands, our synchronous client wrapper breaks. Timeline: 2-3 releases. Start prototyping an async adapter now."
+### Example 1: Vague Direction vs. Specific Forecast
 
 Bad output: "The project is exploring async improvements."
+Good output: "Three maintainers discussed moving to async-first architecture in issue #4521. Draft PR #4600 implements the first phase. If this lands, our synchronous client wrapper breaks. Timeline: 2-3 releases. Start prototyping an async adapter now."
+
+### Example 2: Roadmap Copy vs. Engineering Intel
+
+Bad output: "The project plans to improve performance and add new features in the next release."
+Good output: "PR #5102 (async tensor transfer) has maintainer approval and passing CI. PR #5089 (new quantization backend) is one review away from merge. Both target v0.9.0. The quantization change replaces the GPTQ interface we use in our model prep pipeline (models/quantize.py:23). We need to test our quantization workflow against the new backend before they cut the release."
+
+### Example 3: Stalled Work Ignored vs. Flagged
+
+Bad output: "Development is active with many open PRs."
+Good output: "PR #4800 (multi-node KV cache sharing) has not had a review in 45 days. The author asked for maintainer input twice. This is the feature llm-d needs for disaggregated prefill. If it dies on the vine, we either pick it up ourselves or redesign our prefill routing. Worth assigning someone to review and push this forward."
 
 ## Output Format
 

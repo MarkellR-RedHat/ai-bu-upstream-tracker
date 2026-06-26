@@ -37,9 +37,20 @@ Score each dimension 1-5. Apply weights to get an overall score.
 
 ## Calibration
 
-Good output: "Bus factor is 1. @maintainerX authored 73% of commits in the last 6 months and is the sole reviewer for the engine/ directory. They work at CompanyY, which recently laid off 20% of staff. If they leave, this project stalls."
+### Example 1: Cheerful Summary vs. Honest Risk
 
 Bad output: "The project has a healthy contributor base with active development."
+Good output: "Bus factor is 1. @maintainerX authored 73% of commits in the last 6 months and is the sole reviewer for the engine/ directory. They work at CompanyY, which recently laid off 20% of staff. If they leave, this project stalls."
+
+### Example 2: Raw Numbers vs. Interpreted Signal
+
+Bad output: "The project has 142 open issues and 3,000 stars."
+Good output: "142 open issues, up from 90 three months ago. Median issue response time is 21 days and climbing. The backlog is growing faster than the maintainers can handle. Stars are irrelevant here -- this is a capacity problem."
+
+### Example 3: Generic Recommendation vs. Actionable Call
+
+Bad output: "Continue monitoring the project's health."
+Good output: "Recommendation: KEEP dependency but start evaluating fallbacks. The project is one maintainer departure from stalling. Switching cost is HIGH (6-8 engineer-weeks to port to alternative X). Concrete next step: assign an engineer to become a co-maintainer in the scheduler/ directory. That gives us both influence and insurance."
 
 ## Output Format
 

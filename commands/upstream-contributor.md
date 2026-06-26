@@ -74,9 +74,20 @@ Two to three sentences about contributor dynamics that affect Red Hat's planning
 
 ## Calibration
 
-Good output: "Red Hat has zero reviewer presence in vllm/entrypoints/, which is where 4 of the last 6 breaking API changes originated. @alice reviews 90% of PRs in that directory. Recommendation: assign an engineer to review PRs in entrypoints/ and build a relationship with @alice."
+### Example 1: Vanity Metrics vs. Power Analysis
 
 Bad output: "Red Hat is an active contributor to the project with several engineers participating."
+Good output: "Red Hat has zero reviewer presence in vllm/entrypoints/, which is where 4 of the last 6 breaking API changes originated. @alice reviews 90% of PRs in that directory. Recommendation: assign an engineer to review PRs in entrypoints/ and build a relationship with @alice."
+
+### Example 2: Commit Count vs. Influence Map
+
+Bad output: "The top 5 contributors by commit count are listed below."
+Good output: "@maintainerX has only 12 commits this quarter but reviews 80% of PRs in the scheduler directory. They approved the last 3 breaking changes before anyone downstream noticed. @maintainerY has 200 commits, all in docs and CI. For scheduling decisions, @maintainerX is the gatekeeper."
+
+### Example 3: Generic Gap vs. Specific Risk
+
+Bad output: "Red Hat could increase its contributions to this project."
+Good output: "Red Hat has 3 active contributors, all focused on vllm/engine/. Nobody from Red Hat touches vllm/distributed/ or vllm/worker/. The last two changes that broke our multi-GPU setup both came from vllm/worker/. We are blind in the area that hurts us most."
 
 ## Self-Critique
 

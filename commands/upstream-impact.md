@@ -73,9 +73,20 @@ For each affected component/repo:
 
 ## Calibration
 
-Good output: "PR #17289 removes the --model-loader CLI flag. Our vllm-serving Dockerfile passes --model-loader=safetensors on line 47. This flag no longer exists after this PR. Fix: change to --load-format=safetensors. Effort: 15 minutes plus CI validation."
+### Example 1: Vague Warning vs. Traced Impact
 
 Bad output: "This PR may affect our deployment configuration."
+Good output: "PR #17289 removes the --model-loader CLI flag. Our vllm-serving Dockerfile passes --model-loader=safetensors on line 47. This flag no longer exists after this PR. Fix: change to --load-format=safetensors. Effort: 15 minutes plus CI validation."
+
+### Example 2: Summary vs. Blast Radius
+
+Bad output: "This change updates the scheduler to use a new algorithm. It could impact performance."
+Good output: "PR #5400 replaces the FCFS scheduler with a priority-based scheduler. The old SchedulerOutput.scheduled list is now a dict keyed by priority level. Our custom plugin reads SchedulerOutput.scheduled as a list in llm-d-inference-scheduler/src/scheduler.py:112. This will throw a TypeError at runtime. The fix is to iterate output.scheduled.values() instead. Effort: 1 hour to fix + 2 hours to validate scheduling behavior under load."
+
+### Example 3: Missing the Ecosystem Layer
+
+Bad output: "This PR only changes internal code, no impact on us."
+Good output: "PR #5500 bumps the minimum PyTorch to 2.3. Direct API impact: none, our code does not call the changed functions. Ecosystem impact: our base image pins PyTorch 2.1. Upgrading PyTorch means rebuilding CUDA extensions and revalidating GPU memory behavior. This is a 2-day task for the platform team, not a quick fix."
 
 ## Anti-Patterns
 - Do NOT summarize the PR and call it impact analysis

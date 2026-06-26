@@ -19,9 +19,20 @@ If $ARGUMENTS is provided, use it as a filter: a specific project name, time win
 
 ## Calibration
 
-Good output: "[CRITICAL] vLLM removed --model-loader flag (PR #17289). Our Dockerfile uses this flag. Migration: change line 47 of Dockerfile from --model-loader=safetensors to --load-format=safetensors. Test: rebuild and verify model loads."
+### Example 1: Lazy Flag vs. Verified Threat
 
 Bad output: "[HIGH] vLLM had several breaking changes this week. Review the changelog."
+Good output: "[CRITICAL] vLLM removed --model-loader flag (PR #17289). Our Dockerfile uses this flag. Migration: change line 47 of Dockerfile from --model-loader=safetensors to --load-format=safetensors. Test: rebuild and verify model loads."
+
+### Example 2: False Alarm vs. Confirmed Non-Threat
+
+Bad output: "[HIGH] PR #6000 titled 'Breaking: remove legacy mode' merged this week."
+Good output: "PR #6000 titled 'Breaking: remove legacy mode' merged this week. Checked the diff: 'legacy mode' refers to an internal test harness used by their CI. No public API changes. Not a threat. Excluded from dashboard."
+
+### Example 3: Vague Deprecation vs. Timed Risk
+
+Bad output: "Some APIs are deprecated and will be removed in a future version."
+Good output: "Deprecation: KServe v1beta1 InferenceService CRD marked for removal in KServe 0.14 (estimated Q1 2027). Our operator creates v1beta1 InferenceService resources in 4 places. Removal is 2 releases away. Not urgent today, but needs to land on the Q4 roadmap. Files: operator/controllers/serving.go lines 45, 89, 134, 201."
 
 ## Output Format
 

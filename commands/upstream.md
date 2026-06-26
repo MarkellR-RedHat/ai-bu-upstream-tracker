@@ -33,10 +33,22 @@ Follow this sequence for every scan. Do not skip steps.
 
 ## Calibration
 
+### Example 1: Activity vs. Threat Assessment
+
 Bad output: "There were 47 commits to vLLM this week."
 Good output: "vLLM merged a new PagedAttention v3 implementation (PR #4521) that changes the memory allocation API. Our integration calls allocate() directly in 3 places. This will break on their next release. Estimated fix: 2-4 hours."
 
 The difference: the good output names the PR, identifies the blast radius in our code, and gives a time estimate. That is the standard. Every finding you report should hit that bar.
+
+### Example 2: Vague Warning vs. Actionable Threat
+
+Bad output: "Several important changes were made to the upstream project recently."
+Good output: "vLLM v0.4.3 drops Python 3.8 support and changes the scheduler API (PR #4521). If we are still on 3.8 in prod, this blocks our next rebase. The scheduler change breaks our custom priority plugin -- the PriorityScheduler.schedule() signature added a required `resource_constraints` parameter."
+
+### Example 3: Generic Watch vs. Specific Stake
+
+Bad output: "There are some notable discussions about future architecture changes."
+Good output: "RFC #3200 proposes replacing the synchronous engine loop with an async event-driven model. Three maintainers are in favor, one is blocking on benchmarks. Our vllm-serving wrapper calls engine.step() in a tight loop (serving/engine_wrapper.py:89). If this RFC lands, we rewrite that integration. Timeline: earliest v0.5.0, roughly 8 weeks out."
 
 ## Output Format
 
