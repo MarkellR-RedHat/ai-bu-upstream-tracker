@@ -82,12 +82,40 @@ Open issues or PRs that signal future breakage:
 
 Projects with no breaking changes or deprecations in this window: <comma-separated list>
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### Breaking Change Without Migration Guide
+If a breaking change has no upstream migration documentation, no CHANGELOG entry, and no release note, escalate its severity by one level. Add a note: "No upstream migration guidance exists. The steps below are reverse-engineered from the PR diff. Verify against your environment before applying." Provide the gh command to view the PR diff so the engineer can validate independently.
+
+### License Switch
+If any project changed its LICENSE, COPYING, or NOTICE file in the scan window, add a dedicated section: "**License Changes**" above the Risk Dashboard. License changes are always CRITICAL regardless of whether they are technically "breaking" in the API sense. Flag: project name, old license, new license, PR/commit, and the instruction "Escalate to legal before any new builds pull this version."
+
+### No Releases in 6+ Months
+If a project has no release in 180+ days, add it to a new row in the Risk Dashboard with Severity "INFO" and Change "No release in N months." Explain whether commits are still landing (stale release process) or whether the project appears dormant. If dormant, recommend running `/upstream-health` for a full risk assessment.
+
+### Unconfirmed or Ambiguous Breaking Changes
+If you find a PR that might be breaking but you cannot verify from the diff alone (e.g., behavioral change, default value shift, internal refactor of a public-facing path), list it in a separate "**Unconfirmed / Needs Verification**" section below "Upcoming Breaking Changes." Mark each with the reason for uncertainty and the specific test an engineer should run to confirm.
+
+### Mono-Repo or Multi-Module Projects
+If a project uses a mono-repo structure (e.g., Kubeflow, Kubernetes), filter findings to only the modules/packages listed in the project definition's "Key Areas to Watch." Do not report breaking changes in unrelated subprojects.
+
+## Cross-Tool Integration
+
+After the sweep, suggest exactly one follow-up based on findings:
+- If CRITICAL items exist: "Run `/upstream-impact <org/repo> <PR#>` on the highest-severity change to trace its full blast radius."
+- If migration steps are complex: "Run `/upstream-migration <org/repo> <current-version> <new-version>` to generate a complete upgrade playbook."
+- If multiple projects show deprecations: "Run `/upstream-forecast <project>` on the most affected project to predict when these deprecations become removals."
+- If all clean: "No breaking changes detected. Run `/upstream-weekly` for a broader status check."
+
 ## Anti-Patterns
 
 - Do not report a PR as breaking just because it contains the word "breaking" in the title. Read the content.
 - Do not classify everything as CRITICAL. Save that for real production breakage.
 - Do not say "review this change" without explaining what specifically might break and how to fix it.
 - Do not include migration steps that are just "see the PR for details."
+- Do not ignore license changes, even if no code was modified.
 
 ## Self-Critique
 
@@ -96,3 +124,4 @@ Before outputting, verify:
 - Severity levels are honest. CRITICAL means actually broken, not "could be a problem."
 - Impact traces reference our actual components, not generic statements.
 - False positives have been filtered out. If you cannot confirm something is truly breaking, mark it UNCONFIRMED and explain your uncertainty.
+- License changes have been checked and flagged if found.

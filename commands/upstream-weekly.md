@@ -84,12 +84,43 @@ Good output: "Two items this week. First: vLLM dropped the --model-loader flag (
 Bad output: "Multiple projects saw increased activity this week, suggesting a general trend toward more development."
 Good output: "Both vLLM (PR #5200) and Ray Serve (PR #38100) bumped their minimum Python to 3.10. Our base images still ship 3.9. This blocks upgrades to both projects until we rebuild base images."
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### Complete Quiet Week
+If no tracked project has any notable findings (no releases, no breaking PRs, no active proposals), produce a shortened report: the Executive Summary ("All clear across N tracked projects this week. No threats, no notable proposals, no releases."), an empty Urgency Dashboard with a single row noting "No items this week," and stop. Do not pad with routine PR counts or filler sections. A quiet week is a good report.
+
+### Rate Limits Block Multiple Projects
+If GitHub API rate limits prevent scanning 3+ projects, do not produce partial results without disclosure. Add a "**Coverage Gaps**" section at the top listing which projects were skipped, the gh commands to scan them manually, and a note: "This briefing is incomplete. The following projects were not scanned due to API rate limits." Do not present a partial scan as a full briefing.
+
+### New Dependency Appears in Tracked Projects
+If a tracked project introduces a new dependency (visible in merged PRs touching requirements.txt, go.mod, package.json, or similar) on a project not in our `projects/` directory, flag it in Cross-Project Patterns: "**New upstream dependency detected:** <project> now depends on <new-dep> (PR #NNN). This dependency is not in our tracked set. If it is in our critical path, consider adding a project definition."
+
+### Project Archived or Ownership Transferred Mid-Week
+If `gh repo view` shows a tracked project has been archived or transferred to a new org since the last briefing, this is an ACT NOW item regardless of other findings. Flag it in the Urgency Dashboard and add a Per-Project Intelligence section: "Repository <org/repo> has been <archived/transferred>. Immediate assessment needed. Run `/upstream-health <project>` for a full viability check."
+
+### Correlated Changes Across Projects
+If the same type of change appears in 3+ projects in the same week (e.g., Python version bumps, Kubernetes API version migrations, security patches for the same CVE), elevate this from Cross-Project Patterns to the Executive Summary. This is a systemic shift, not a coincidence. Provide a single consolidated action item rather than per-project duplicates.
+
+### First Briefing / No Baseline
+If this is the first time running `/upstream-weekly` (no prior briefing to compare against), note: "This is the initial briefing with no prior baseline for comparison. Trend indicators (up/down/stable) are not available this week. They will appear in subsequent runs."
+
+## Cross-Tool Integration
+
+After completing the briefing, suggest the most relevant follow-up based on findings:
+- If ACT NOW items exist: "Run `/upstream-impact <org/repo> <PR#>` on the highest-priority ACT NOW item to get the full blast radius analysis."
+- If health concerns surfaced (stalled projects, low activity): "Run `/upstream-health <project>` on the most concerning project for a deep dependency risk assessment."
+- If contribution gaps were visible in the findings: "Run `/upstream-opportunity` to find strategic contribution targets that would improve our position."
+- If all clear: "Clean week. No follow-up needed. Next scheduled briefing: <date + 7 days>."
+
 ## Anti-Patterns
 
 - Do NOT include a project section just to say "no activity" or pad with routine PRs
 - Do NOT mark everything as urgent. A quiet week is a good week. Say so.
 - Do NOT recommend "keep monitoring" without saying what specifically to watch for
 - Do NOT pad cross-project themes with obvious observations or forced connections
+- Do NOT present a partial scan (due to rate limits) as a complete briefing without disclosure
 
 ## Self-Critique
 
@@ -98,3 +129,4 @@ Before outputting, verify:
 - Action items are specific enough to assign to a person
 - The full digest fits in roughly three screens of text
 - If rate-limited on some projects, note which were skipped and provide the gh commands
+- Edge cases (quiet week, archived repos, correlated changes) have been handled explicitly

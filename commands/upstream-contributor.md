@@ -97,9 +97,37 @@ Before outputting, verify:
 - Engagement recommendations name specific people, directories, and actions
 - Bus factor assessment is honest, not optimistic
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### Single-Org Dominance
+If 80%+ of commits and reviews come from one organization, add a "**Concentration Risk**" callout after the Power Structure section. Name the org, the percentage, and the strategic implication: "If <org> deprioritizes this project, there is no fallback maintainer base. Red Hat should either diversify the contributor pool or plan for a fork scenario."
+
+### Key Maintainer Departure
+If a top-3 contributor (by review activity or merge authority) has zero activity in the last 30 days after being consistently active, flag this in the Community Health section: "<username> was a top reviewer in <area> and has gone quiet. Last activity: <date>. If they have left the project, the bus factor in <area> drops to N." Do not speculate on personal reasons.
+
+### Fork Divergence from Upstream Contributor Base
+If the project definition mentions a downstream fork, check whether our fork's active contributors overlap with upstream's power structure. If there is zero overlap (no Red Hat contributor reviews PRs in the areas we fork), flag: "Our fork contributors have no upstream review presence. Changes we make downstream have no advocate upstream. Risk: rebase conflicts go undetected until they break the build."
+
+### Ghost Town Project
+If fewer than 3 unique contributors have committed in the last 30 days, skip the normal Power Structure table and instead produce a "**Project Viability Warning**": contributor count, last meaningful PR, and whether the project should be evaluated for replacement or internal adoption. Recommend running `/upstream-health` for a full risk assessment.
+
+### Bot-Dominated Activity
+If automated accounts (dependabot, renovate, github-actions) represent more than 50% of commit or PR activity, exclude them from contributor counts and note: "N% of activity is automated. Human contributor metrics are reported separately below." This prevents inflated health signals.
+
+## Cross-Tool Integration
+
+After completing the power map, suggest exactly one follow-up:
+- If Red Hat has gaps in critical areas: "Run `/upstream-opportunity <project>` to find contribution targets that would fill the gaps identified above."
+- If bus factor is critical (1-2): "Run `/upstream-health <project>` to assess overall dependency risk given the contributor concentration."
+- If a maintainer departure is detected: "Run `/upstream-forecast <project>` to check whether stalled PRs correlate with the missing maintainer."
+- If the power map looks healthy: "No immediate concerns. Run `/upstream <project>` for a threat scan of recent changes."
+
 ## Anti-Patterns
 
 - Do not rank contributors by commit count without explaining influence
 - Do not assume GitHub usernames map to companies without evidence
 - Do not recommend "increasing contributions" without saying where and why
 - Do not ignore the review layer - reviewers often have more power than authors
+- Do not count bot activity as human contribution

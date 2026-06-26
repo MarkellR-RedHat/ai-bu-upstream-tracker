@@ -96,12 +96,43 @@ Good output: "Gotcha: the new async engine silently drops requests that exceed t
 Bad output: "Update your dependencies and test thoroughly."
 Good output: "Step 1: Bump vllm in requirements.txt from 0.4.2 to 0.4.3. Do NOT update ray yet. Step 2: Apply BC-1 (model_loader rename) in serving/config.py. Step 3: Apply BC-2 (scheduler API change) in scheduler/priority.py. Step 4: Run `pytest tests/serving/` -- expect 2 new warnings about deprecated batch_size parameter. Step 5: Now bump ray to 2.10 (requires vllm 0.4.3+). Step 6: Full test suite."
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### No Changelog or Migration Docs
+If the project has no CHANGELOG.md, MIGRATION.md, UPGRADING.md, or docs/migration/ directory, note this at the top of the guide: "**Warning:** This project does not maintain migration documentation. All breaking changes below were identified by diffing release notes and PR history. There may be undocumented behavioral changes. Run the full test suite after each migration step and watch for unexpected failures." Increase effort estimates by 25% to account for discovery time.
+
+### Version Gap Spans Multiple Breaking Releases
+If the old-to-new version range spans more than one release with breaking changes, structure the migration as incremental steps through each intermediate version rather than a single jump. Add a note: "Jumping directly from <old> to <new> skips intermediate migrations that may have ordering dependencies. The plan below steps through each breaking release in sequence."
+
+### Breaking Change Without Upstream Acknowledgment
+If a behavioral change is not documented as breaking by upstream but your analysis of the diff reveals it will break our usage, flag it: "**Undocumented Breaking Change:** This change is not listed as breaking in the release notes, but it modifies <behavior> that we depend on. Evidence: <diff reference>. Treat as a verified breaking change."
+
+### Dependency Chain Conflicts
+If the version bump introduces a transitive dependency conflict (e.g., the new version requires PyTorch 2.3 but another dependency pins PyTorch 2.1), add a "**Dependency Conflicts**" section before the Step-by-Step Upgrade Plan. List each conflict, the constraining dependency, and the resolution order. The upgrade plan must account for resolving these first.
+
+### Rollback Not Possible
+If the migration includes a data migration, schema change, or irreversible state transformation, note in the Rollback Plan: "**Partial rollback only.** The following changes are irreversible: <list>. Take a full backup/snapshot before starting." If rollback is fully impossible, say so plainly.
+
+### No Releases Between Versions
+If `gh release list` shows no intermediate releases between old and new (e.g., jumping from a tag to HEAD), treat the migration as a "moving to main" scenario. Add a warning: "You are migrating to an unreleased version. The API surface may change again before the next stable release. Pin to a specific commit SHA rather than tracking main."
+
+## Cross-Tool Integration
+
+After completing the migration guide, suggest exactly one follow-up:
+- If undocumented breaking changes were found: "Run `/upstream-breaking` to check whether these undocumented changes affect other tracked projects."
+- If the migration is complex (3+ breaking changes): "Run `/upstream-impact <org/repo> <most-complex-PR>` to trace the blast radius of the hardest change in detail."
+- If dependency conflicts were found: "Run `/upstream-health <conflicting-project>` to assess whether the conflicting dependency is actively maintained."
+- If the migration is straightforward: "Migration is low-risk. Run `/upstream-forecast <project>` to see what is coming in the next release."
+
 ## Anti-Patterns
 
 - Do NOT paste the changelog and call it a migration guide
 - Do NOT list breaking changes without showing old and new code
 - Do NOT skip the gotchas section - it is often the most valuable part
 - Do NOT forget to include test suite updates in effort estimates
+- Do NOT recommend jumping across multiple breaking releases in a single step without justification
 
 ## Self-Critique
 
@@ -109,3 +140,4 @@ Good output: "Step 1: Bump vllm in requirements.txt from 0.4.2 to 0.4.3. Do NOT 
 - Upgrade plan is in correct dependency order
 - Effort estimates account for testing, not just code changes
 - Gotchas are based on evidence (issues, reports), not speculation
+- Dependency conflicts have been identified and sequenced into the plan

@@ -88,14 +88,46 @@ Good output: "PR #5400 replaces the FCFS scheduler with a priority-based schedul
 Bad output: "This PR only changes internal code, no impact on us."
 Good output: "PR #5500 bumps the minimum PyTorch to 2.3. Direct API impact: none, our code does not call the changed functions. Ecosystem impact: our base image pins PyTorch 2.1. Upgrading PyTorch means rebuilding CUDA extensions and revalidating GPU memory behavior. This is a 2-day task for the platform team, not a quick fix."
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### PR Not Yet Merged
+If the specified PR is still open, adjust the report header to show "Status: OPEN - Not yet merged" and add a "**Pre-Merge Advisory**" note: "This change has not shipped yet. Impact analysis is based on the current diff, which may change before merge. If this PR affects us, now is the time to comment on it upstream." Shift the Recommended Timeline to focus on when to engage rather than when to migrate.
+
+### Change Affects Multiple Tracked Projects
+After tracing impact through the primary project, check whether the change cascades to other tracked projects. For example, a vLLM API change may affect llm-d, which integrates vLLM. If cascade impact is found, add a "**Cascade Impact**" section listing each affected project and its specific exposure. Recommend running `/upstream-impact` on the downstream project as well.
+
+### Unreleased Change (Merged to Main, Not Tagged)
+If the change is merged but not in any release tag, note: "This change is in main but has not been released yet. It will affect us when we next pull from main or when the next release ships." Estimate when the next release will include this change based on the project's release cadence from its definition file.
+
+### Revert or Follow-Up PR Exists
+Check `gh search prs --repo <org/repo> "revert #<PR-number>" --limit 5` and scan for follow-up PRs that modify the same files. If a revert exists, note: "This change was reverted in PR #NNN. No action needed unless the revert is re-reverted." If a follow-up modifies the same surface area, include it in the analysis.
+
+### Change is Internal / No External Impact
+If thorough analysis shows the change is purely internal with no impact on any public API, config, CLI, or behavior we depend on, produce a shortened report: the Change Summary, the Impact Assessment table showing all NONE, and a one-line conclusion: "No downstream impact. No action required." Do not pad the report with hypothetical risks.
+
+### Missing Project Definition
+If the specified org/repo is not in `projects/`, run the analysis without cross-referencing but add a note: "No project definition found for <org/repo>. Impact assessment is based on general analysis rather than mapped integration points. Results may miss downstream-specific exposure. Consider adding a project definition."
+
+## Cross-Tool Integration
+
+After completing the impact analysis, suggest exactly one follow-up:
+- If migration is needed: "Run `/upstream-migration <org/repo> <current-version> <target-version>` for a full upgrade playbook covering this and other changes between versions."
+- If the change is high-impact and not yet released: "Run `/upstream-forecast <project>` to estimate when this change will ship and what else is coming with it."
+- If cascade impact is detected: "Run `/upstream <downstream-project>` to check for additional threats to the affected downstream project."
+- If no impact: "No action needed. Run `/upstream-weekly` for a broader ecosystem check."
+
 ## Anti-Patterns
 - Do NOT summarize the PR and call it impact analysis
 - Do NOT say "this could affect our integration" without specifying which integration, which file, and how
 - Do NOT provide migration steps that are just "update to the new API" without showing the concrete change
 - Do NOT assume every change requires immediate action; some can wait, and the no-op option should be honestly assessed
+- Do NOT skip the revert/follow-up check. Analyzing a change that has already been undone wastes everyone's time.
 
 ## Self-Critique
 - [ ] Impact assessment traces to specific components, files, and lines, not generic "could affect" statements
 - [ ] Migration steps are concrete enough that an engineer can start work immediately
 - [ ] Effort estimates include testing and are realistic, not optimistic
 - [ ] If you cannot determine impact on a specific component, say so and suggest how to verify
+- [ ] Revert and follow-up PRs have been checked

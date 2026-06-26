@@ -66,11 +66,39 @@ This is gold. What stopped moving and why? Include last activity date and likely
 ### Risks and Wildcards
 What could change this forecast? Key maintainer departures, contested RFCs, funding shifts, competing proposals.
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### Dead or Dormant Project
+If `gh release list` shows no release in 180+ days AND commit activity is below 5 commits/month, do not produce a standard forecast. Instead, output a "**Project Dormancy Assessment**": last release date, last commit date, number of open PRs without review, and whether any maintainer has been active. Conclude with: "Forecasting is not meaningful for a dormant project. Run `/upstream-health` for a full viability assessment."
+
+### Competing Forks or Project Splits
+If issues or discussions reference a fork, competing implementation, or governance dispute, add a "**Fork Risk**" section to Risks and Wildcards. Name the fork, who is driving it, and what it means for our dependency: "If the community splits, we need to pick a side. Current risk level: LOW/MEDIUM/HIGH."
+
+### Release Cadence Breakdown
+If the gap between the last two releases is more than 2x the historical average, flag this: "Release cadence has slowed significantly. Previous average: N weeks. Current gap: N weeks. Possible causes: maintainer bandwidth, feature freeze, or internal restructuring." This affects all timeline estimates in the forecast.
+
+### Abandoned RFCs and Proposals
+If an RFC or proposal has been open for 90+ days with no maintainer response, do not list it as "being discussed." Move it to "What is Stalled" with the note: "This proposal appears abandoned. Last activity: <date>. If we need this feature, we should either revive the discussion or implement it ourselves."
+
+### Version Pinning Conflicts
+If the forecast identifies upcoming changes that conflict with version pins in our project definitions (e.g., upstream bumping minimum Python while we pin an older version), flag this in Planning Implications under "Start now" with the specific version constraint and which of our components enforce it.
+
+## Cross-Tool Integration
+
+After completing the forecast, suggest exactly one follow-up:
+- If high-impact PRs are near merge: "Run `/upstream-impact <org/repo> <PR#>` on the most impactful near-merge PR to trace its blast radius before it ships."
+- If stalled work includes features we need: "Run `/upstream-contributor <project>` to identify who could unblock the stalled PRs and whether Red Hat should offer to pick them up."
+- If the project looks dormant: "Run `/upstream-health <project>` to evaluate whether this dependency is still safe to rely on."
+- If the forecast shows a busy next release: "Run `/upstream-breaking <project>` after the release ships to catch anything that slipped through."
+
 ## Anti-Patterns
 - Do NOT predict everything will ship. Most open PRs do not merge quickly.
 - Do NOT ignore stalled work. What is NOT progressing is as valuable as what is.
 - Do NOT present proposals as certain to ship. They might be rejected.
 - Do NOT forecast without basing it on release cadence data.
+- Do NOT treat a dormant project the same as an active one. Adjust the format.
 
 ## Self-Critique
 Before outputting, verify:
@@ -78,3 +106,4 @@ Before outputting, verify:
 - Timeline estimates are based on release cadence data, not vibes
 - Impact assessments reference our specific usage, not generic statements
 - Planning implications are specific enough to put on a roadmap
+- Dormant or slowing projects are flagged, not silently treated as active

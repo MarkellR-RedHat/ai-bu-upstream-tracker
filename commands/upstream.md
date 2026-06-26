@@ -96,12 +96,40 @@ Before sending, verify:
 - Urgency levels are honest. If nothing is urgent, say so. Crying wolf erodes trust.
 - You have not padded the report with routine commits to look thorough
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### No Releases in 6+ Months
+If `gh release list` shows no release in the last 180 days, flag this in the Situation section with the exact date of the last release. Check whether PRs are still merging (active development without releases is a different risk than a dead project). Add a PLAN-level finding: "No release in N months. Commits are still landing / have also stopped. Risk: we may be pinned to an outdated version with no upstream fix path."
+
+### Unknown or Untracked Upstream
+If the user names a project not in `projects/`, do not refuse. Treat it as an ad-hoc scan: ask for org/repo if only a name was given. Skip project-definition cross-referencing but still run the full data gathering pipeline. Note "this project is not in our tracked set" in the output header. Run `/upstream-health` data gathering as a baseline alongside the threat scan. If results look relevant, recommend adding a project definition file.
+
+### Fork Divergence
+If the project definition mentions a downstream fork, check the fork's HEAD against upstream main: `gh api repos/<org/repo>/compare/<fork-default-branch>...<upstream-default-branch> --jq '.ahead_by, .behind_by'`. If behind_by exceeds 100 commits or 30 days of drift, flag as PLAN: "Our fork is N commits behind upstream. Rebase debt is accumulating. Last sync: <date>."
+
+### License Change
+If the latest release or any merged PR modifies a LICENSE, COPYING, or NOTICE file, flag as ACT NOW regardless of other content. License changes can block redistribution and require legal review.
+
+### Repository Archived or Transferred
+If `gh repo view` returns archived status or redirects to a new org/repo, flag as ACT NOW: "Repository has been archived/transferred. Evaluate replacement or fork ownership immediately."
+
+## Cross-Tool Integration
+
+After completing the scan, suggest the most relevant follow-up command based on findings. Pick exactly one:
+- If ACT NOW items exist: "Run `/upstream-impact <org/repo> <PR#>` to trace the blast radius of the most critical change."
+- If PLAN items reference version bumps: "Run `/upstream-migration <org/repo> <old> <new>` to generate an upgrade playbook."
+- If the Quick Reference shows low activity or missing releases: "Run `/upstream-health <project>` to assess whether this dependency is still viable."
+- If no threats detected: "All clear. Run `/upstream-forecast <project>` if you want to see what is coming next."
+
 ## Anti-Patterns
 
 - Do not list PRs without explaining why they matter to us
 - Do not flag everything as a threat. Quiet week? Say "all clear" and stop.
 - Do not write "this could potentially affect" without naming what, how, and how badly
 - Do not include CI, docs, or typo PRs unless they reveal a pattern
+- Do not silently skip edge cases. If the repo has no releases, no activity, or a license change, that is the finding.
 
 ## Output Rules
 

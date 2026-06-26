@@ -90,12 +90,40 @@ Good output: "Best opportunity this week: vLLM Issue #5300, refactor the distrib
 Bad output: "Contributing to upstream projects builds goodwill and helps the community."
 Good output: "We have zero review presence in kserve/pkg/apis/, where CRD schema changes originate. Last quarter, two schema changes broke our operator and we found out after release. Picking up Issue #920 (CRD validation refactor) puts an engineer in the review chain for that directory. That is early warning, not goodwill."
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### Project Hostile to External Contributors
+If a project has CLA/DCO requirements, check for a CONTRIBUTING.md or CLA file. If the contribution process is unusually restrictive (corporate CLA required, specific employer restrictions, or historically slow review of external PRs), add a "**Contribution Barriers**" note to that project's section: "This project requires <CLA/DCO/specific process>. Median time to first review for external contributors: <estimate from PR data>. Factor this into effort estimates."
+
+### Only Stale Issues Available
+If all candidate issues for a project are 90+ days old with no recent comments, do not list them as opportunities. Instead, note: "All open issues in strategic areas are stale (90+ days without activity). This may indicate maintainer bandwidth problems or a preference for unsolicited PRs over issue-driven work. Consider filing a new issue or RFC to propose the contribution directly." Recommend running `/upstream-health` if this pattern appears across multiple projects.
+
+### Project Has No "Good First Issue" or "Help Wanted" Labels
+If a project does not use these labels, fall back to scanning recent issues for keywords like "contributions welcome," "looking for help," or maintainer comments inviting work. Also check for recently closed issues that were fixed by first-time contributors as a signal of approachability. Note: "This project does not use standard contribution labels. Opportunities below were identified from issue content and contributor patterns."
+
+### Red Hat Already Dominates the Area
+If the strategic assessment reveals Red Hat already has strong review presence and contributor activity in a critical area, do not recommend more of the same. Instead, flag: "Red Hat is already well-positioned in <area>. Consider redirecting effort to <adjacent-area> where we have gaps." Cross-reference with `/upstream-contributor` findings if available.
+
+### Upstream Project is Pre-1.0 or Rapidly Changing
+If the project has no stable release or is iterating rapidly (weekly releases, frequent API changes), note: "This project's API surface is unstable. Contributions to core code paths may require rework as the project evolves. Focus on test infrastructure, documentation, or peripheral tooling where churn is lower."
+
+## Cross-Tool Integration
+
+After completing the opportunity scan, suggest exactly one follow-up:
+- If strategic gaps were identified: "Run `/upstream-contributor <project>` to map the power structure and identify who to build relationships with before contributing."
+- If contribution barriers were found: "Run `/upstream-health <project>` to determine whether the maintainer bandwidth issues are a temporary dip or a structural problem."
+- If high-value opportunities exist in projects with recent breaking changes: "Run `/upstream-breaking` to ensure your contribution aligns with the project's current direction and does not conflict with in-flight API changes."
+- If no good opportunities were found: "No high-value contribution targets right now. Run `/upstream-forecast` across tracked projects to identify upcoming features where early involvement would give us influence."
+
 ## Anti-Patterns
 
 - Do not list every "good first issue" without assessing strategic fit. Easy but irrelevant wastes effort.
 - Do not suggest "contributing to build goodwill" without explaining the specific strategic angle.
 - Do not silently include stale issues. An issue open for a year with no comments is probably dead.
 - Do not pad the list with issues in areas where we have no downstream interest.
+- Do not ignore CLA/DCO requirements. An engineer discovering them mid-PR wastes everyone's time.
 
 ## Self-Critique
 
@@ -103,6 +131,7 @@ Good output: "We have zero review presence in kserve/pkg/apis/, where CRD schema
 - Assigned and stale issues are filtered or flagged, not silently included.
 - Recommendations match the requested scenario (onboarding vs. hackathon vs. strategic).
 - The "avoid" section is honest about issues that look appealing but are not worth the effort.
+- Contribution barriers have been checked and noted for each project.
 
 ## Output Rules
 

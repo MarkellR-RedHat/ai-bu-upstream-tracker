@@ -71,12 +71,43 @@ One to two sentence blunt assessment.
 
 **Recommendation** - Should we keep depending on this? What are realistic alternatives? Rate switching cost: LOW / MEDIUM / HIGH / PROHIBITIVE. Give an actionable next step, not "keep monitoring."
 
+## Edge Cases
+
+Handle these explicitly. Do not silently skip them.
+
+### License Change
+Check `gh api repos/<org/repo>/commits --jq '.[].files[].filename' | grep -iE 'license|copying|notice'` for recent license file modifications. If found, add a "**License Risk**" section with the old and new license, the commit/PR that changed it, and: "License changes require legal review before pulling new versions into downstream builds. Escalate immediately."
+
+### Single-Org Project Going Dark
+If Org Diversity scores 1 (single org) AND commit activity has dropped more than 50% compared to the previous quarter, flag: "This project is controlled by <org> and their activity is declining. Risk: project abandonment with no community to sustain it. Switching cost assessment becomes urgent." Add this to the Risks section with a concrete recommendation to begin evaluating alternatives.
+
+### Fork Divergence
+If the project definition references a downstream fork, measure drift: `gh api repos/<org/repo>/compare/<fork-branch>...<upstream-branch> --jq '.behind_by, .ahead_by'`. Report the numbers and flag if behind_by exceeds 100 commits: "Our fork is N commits behind upstream. Rebase cost increases nonlinearly with drift. Current estimated rebase effort: <rough estimate based on commit count>."
+
+### Archived or Read-Only Repository
+If `gh repo view` shows the repository as archived, override all health scores with a flat "CRITICAL" rating and produce a shortened report: "This repository is archived. No further development is expected. Immediate actions: evaluate alternatives, assess switching cost, determine whether to fork and maintain internally."
+
+### Dependency Security Signals
+Check `gh pr list --repo <org/repo> --author "dependabot[bot]" --state open --limit 10` and `gh pr list --repo <org/repo> --author "renovate[bot]" --state open --limit 10`. If more than 5 automated dependency PRs are open and unmerged for 30+ days, flag in CI Health: "Dependency update backlog suggests understaffed maintenance. N automated PRs are open and unmerged, some with security implications."
+
+### No Release Tags
+If `gh release list` returns zero results, check for tags: `gh api repos/<org/repo>/tags --jq '.[0:5] | .[].name'`. If tags exist but no GitHub releases, note: "This project uses tags without GitHub releases. Release cadence scoring is based on tag history." If neither exists, score Release Cadence as 1 and note: "No releases or tags found. This project may use a rolling-release model or may be pre-1.0."
+
+## Cross-Tool Integration
+
+After completing the health assessment, suggest exactly one follow-up:
+- If bus factor is critical: "Run `/upstream-contributor <project>` to map the full power structure and identify where Red Hat can build maintainer presence."
+- If the project scores AT RISK or CRITICAL: "Run `/upstream-forecast <project>` to determine whether the trajectory is improving or worsening."
+- If license risk is flagged: "Run `/upstream-breaking` to check whether this license change affects other tracked projects as well."
+- If the project is healthy: "No concerns. Run `/upstream <project>` for a routine threat scan."
+
 ## Anti-Patterns
 
 - GitHub stars are not health. A project with 50k stars and one maintainer is fragile.
 - High commit volume is not health. One person rage-committing is worse than a quiet project with five steady contributors.
 - A project run entirely by one company is one reorg away from abandonment. Always flag single-org dominance.
 - Raw numbers without interpretation are useless. "142 open issues" means nothing without context on trend and response time.
+- Do not skip license file checks. A license change buried in a minor release can block redistribution.
 
 ## Self-Critique
 
@@ -85,5 +116,6 @@ Before outputting, verify:
 - Bus factor names specific people and their organizational affiliation
 - Risks include evidence and downstream impact, not just "could be better"
 - The recommendation includes a concrete action, not just a sentiment
+- License, archive status, and fork drift have been checked
 
 If API rate limits block some data, note which dimensions are unscored and print the manual commands.
