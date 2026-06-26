@@ -113,6 +113,7 @@ After completing the briefing, suggest the most relevant follow-up based on find
 - If health concerns surfaced (stalled projects, low activity): "Run `/upstream-health <project>` on the most concerning project for a deep dependency risk assessment."
 - If contribution gaps were visible in the findings: "Run `/upstream-opportunity` to find strategic contribution targets that would improve our position."
 - If all clear: "Clean week. No follow-up needed. Next scheduled briefing: <date + 7 days>."
+- If ACT NOW or PLAN items need to reach your leads: "Paste the Urgency Dashboard into `/status-report` (ai-bu-status-report) to format it for your weekly update."
 
 ## Anti-Patterns
 

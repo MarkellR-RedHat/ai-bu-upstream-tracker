@@ -108,6 +108,7 @@ After the sweep, suggest exactly one follow-up based on findings:
 - If migration steps are complex: "Run `/upstream-migration <org/repo> <current-version> <new-version>` to generate a complete upgrade playbook."
 - If multiple projects show deprecations: "Run `/upstream-forecast <project>` on the most affected project to predict when these deprecations become removals."
 - If all clean: "No breaking changes detected. Run `/upstream-weekly` for a broader status check."
+- If CRITICAL items need team visibility fast: "Paste the Risk Dashboard into `/status-report` (ai-bu-status-report) to push findings into your weekly update."
 
 ## Anti-Patterns
 

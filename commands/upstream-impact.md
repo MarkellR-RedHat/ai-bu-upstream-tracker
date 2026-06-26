@@ -117,6 +117,7 @@ After completing the impact analysis, suggest exactly one follow-up:
 - If the change is high-impact and not yet released: "Run `/upstream-forecast <project>` to estimate when this change will ship and what else is coming with it."
 - If cascade impact is detected: "Run `/upstream <downstream-project>` to check for additional threats to the affected downstream project."
 - If no impact: "No action needed. Run `/upstream-weekly` for a broader ecosystem check."
+- If the change has competitive implications (e.g., a feature our competitors already ship): "Run `/whats-new <competitor-project>` (ai-bu-competitive-watch) to see how this change shifts the competitive landscape."
 
 ## Anti-Patterns
 - Do NOT summarize the PR and call it impact analysis

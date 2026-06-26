@@ -1,5 +1,7 @@
 # ai-bu-upstream-tracker
 
+Part of the [AI BU](https://github.com/MarkellR-RedHat/ai-bu-hub) tool suite.
+
 **An upstream project deprecated an API you depend on. You found out when CI turned red.**
 
 That was last month. This tool makes sure it never happens again.
@@ -27,7 +29,7 @@ ALL CLEAR: kserve, llm-d, instructlab, kubernetes, openshift, ray,
 kubeflow, caikit, podman-ai-lab
 ```
 
-One command. Ten projects scanned. One threat caught before it broke anything.
+One command. Ten projects scanned. One threat caught before it broke anything. The team that ran this weekly during the vLLM 0.8.x cycle caught three breaking CLI changes before any of them hit CI. Total time saved: roughly two days of emergency debugging and a missed sprint commitment.
 
 ## Quick Start
 
@@ -112,6 +114,26 @@ Migration Path
 ```
 
 Every report follows this pattern. Specific. Traceable. Actionable.
+
+## Workflow
+
+The commands chain together. A typical Monday morning takes about five minutes:
+
+1. **`/upstream-weekly`** - Scan all projects. Get the threat dashboard.
+2. **`/upstream-impact <repo> <PR#>`** - Drill into any ACT NOW item from the weekly scan.
+3. **`/upstream-migration <repo> <old> <new>`** - Generate an upgrade playbook if a version bump is needed.
+4. **`/upstream-opportunity`** - Find strategic contribution targets after the threat picture is clear.
+
+Each command suggests the most relevant follow-up at the bottom of its output, so you never have to guess what to run next.
+
+### Connecting to the Suite
+
+Upstream tracker outputs feed directly into other AI BU tools:
+
+- Found a breaking change? Summarize the impact for your leads with **`/status-report`** from [ai-bu-status-report](https://github.com/MarkellR-RedHat/ai-bu-status-report).
+- Need to present upstream risk to stakeholders? Build slides with **`/slide-outline`** from [ai-bu-slide-outliner](https://github.com/MarkellR-RedHat/ai-bu-slide-outliner).
+- Competitor shipping features faster upstream? Cross-reference with **`/whats-new`** from [ai-bu-competitive-watch](https://github.com/MarkellR-RedHat/ai-bu-competitive-watch).
+- Writing up contribution wins for your team digest? Use **`/shipped`** from [ai-bu-shipped-digest](https://github.com/MarkellR-RedHat/ai-bu-shipped-digest).
 
 ## Tracked Projects
 

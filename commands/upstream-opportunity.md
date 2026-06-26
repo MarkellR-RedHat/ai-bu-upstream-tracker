@@ -116,6 +116,7 @@ After completing the opportunity scan, suggest exactly one follow-up:
 - If contribution barriers were found: "Run `/upstream-health <project>` to determine whether the maintainer bandwidth issues are a temporary dip or a structural problem."
 - If high-value opportunities exist in projects with recent breaking changes: "Run `/upstream-breaking` to ensure your contribution aligns with the project's current direction and does not conflict with in-flight API changes."
 - If no good opportunities were found: "No high-value contribution targets right now. Run `/upstream-forecast` across tracked projects to identify upcoming features where early involvement would give us influence."
+- If onboarding-scenario opportunities were requested: "Use `/onboarding-checklist` (ai-bu-onboarding-kit) to build a first-week plan that includes these upstream contributions."
 
 ## Anti-Patterns
 
