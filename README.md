@@ -1,30 +1,75 @@
 # ai-bu-upstream-tracker
 
-Last month, an upstream project deprecated an API you depend on. You found out when CI turned red. This tool makes sure that never happens again.
+**An upstream project deprecated an API you depend on. You found out when CI turned red.**
 
-These are Claude Code slash commands that act as an early warning system for Red Hat's AI Business Unit. They watch upstream open source projects, flag the changes that could hurt you, and tell you exactly what to do about them. Not activity logs. Threat assessments.
+That was last month. This tool makes sure it never happens again.
 
-## How It Catches Threats
+## Before and After
 
-Nine commands. Three tiers of analysis.
+**Before:** You scan GitHub manually, skim changelogs, and hope someone on the team notices the breaking change before it hits your build.
+
+**After:**
+
+```
+> /upstream-breaking
+
+Breaking Changes Threat Sweep
+Scan window: 2026-06-12 to 2026-06-26 | Projects scanned: 10
+
+THREATS DETECTED: 1
+
+[ACT NOW] vllm-project/vllm PR #17289
+  Removed deprecated --model-loader CLI flag.
+  Blast radius: Our Dockerfile passes --model-loader=safetensors.
+  Fix: Change to --load-format=safetensors before next image build.
+
+ALL CLEAR: kserve, llm-d, instructlab, kubernetes, openshift, ray,
+kubeflow, caikit, podman-ai-lab
+```
+
+One command. Ten projects scanned. One threat caught before it broke anything.
+
+## Quick Start
+
+```bash
+git clone https://github.com/MarkellR-RedHat/ai-bu-upstream-tracker.git
+cd ai-bu-upstream-tracker
+./install.sh
+```
+
+Then open Claude Code and run:
+
+```
+/upstream-breaking
+```
+
+That scans all 10 tracked projects for breaking changes in the last 14 days. If something needs your attention, you will know in under a minute.
+
+## Commands
 
 ### Threat Detection
 
-- `/upstream <project>` - Threat assessment for a single project. Classifies every finding as ACT NOW, PLAN, or WATCH. Ignores noise.
-- `/upstream-weekly` - Weekly threat briefing across all tracked projects. If it was a quiet week, it says so in two sentences.
-- `/upstream-breaking` - Threat sweep across all projects for breaking changes and deprecations. Produces a risk dashboard with migration steps.
+| Command | What it does |
+|---------|-------------|
+| `/upstream <project>` | Threat assessment for a single project. Classifies every finding as ACT NOW, PLAN, or WATCH. |
+| `/upstream-weekly` | Weekly threat briefing across all tracked projects. Quiet weeks get two sentences. |
+| `/upstream-breaking` | Sweep all projects for breaking changes and deprecations. Produces a risk dashboard with migration steps. |
 
 ### Deep Analysis
 
-- `/upstream-impact <repo> <PR#>` - Blast radius analysis of a specific upstream change. Traces it through our stack, identifies what breaks, and estimates fix effort.
-- `/upstream-migration <repo> <old-version> <new-version>` - Field upgrade playbook with before/after code, gotchas from community reports, and a dependency-ordered plan.
-- `/upstream-health <project>` - Dependency risk assessment. Bus factor, release cadence, maintainer concentration. Answers "should we still bet on this project?"
-- `/upstream-forecast <project>` - Forward-looking intelligence. What ships next, what is being discussed, what stalled. Predicts impact on our planning.
+| Command | What it does |
+|---------|-------------|
+| `/upstream-impact <repo> <PR#>` | Blast radius analysis of a specific upstream change. Traces through our stack, identifies what breaks, estimates fix effort. |
+| `/upstream-migration <repo> <old> <new>` | Upgrade playbook with before/after code, community-reported gotchas, and a dependency-ordered plan. |
+| `/upstream-health <project>` | Dependency risk assessment. Bus factor, release cadence, maintainer concentration. Should we still bet on this project? |
+| `/upstream-forecast <project>` | Forward-looking intelligence. What ships next, what is being discussed, what stalled. |
 
 ### Community Intelligence
 
-- `/upstream-contributor <project>` - Power map of who controls what ships, where Red Hat has influence, and where we have gaps.
-- `/upstream-opportunity` - Strategic contribution targets prioritized by influence value, not just labeled "good first issue."
+| Command | What it does |
+|---------|-------------|
+| `/upstream-contributor <project>` | Power map of who controls what ships, where Red Hat has influence, and where we have gaps. |
+| `/upstream-opportunity` | Strategic contribution targets prioritized by influence value, not just labeled "good first issue." |
 
 ## Example: Tracing a Threat to Your Code
 
@@ -66,58 +111,12 @@ Migration Path
   Risk if delayed: next image build produces a broken container.
 ```
 
-That is what every report looks like. Specific. Traceable. Actionable.
-
-## Example: Threat Assessment
-
-```
-/upstream vllm
-```
-
-Output:
-
-```
-vLLM - Threat Assessment
-Scanned: 2026-06-26 | Repo: vllm-project/vllm
-
-Situation
-vLLM is in active development between v0.8.2 and v0.8.3. 34 PRs merged
-this week. High pace of change focused on disaggregated inference and
-multi-LoRA support. One breaking change requires attention.
-
-ACT NOW
-[ACT NOW] PR #17289: Removed deprecated --model-loader CLI flag
-  Blast radius: Our Dockerfile passes --model-loader=safetensors.
-  This flag no longer exists in main.
-  Action: Update Dockerfile to use --load-format=safetensors before
-  next image build.
-
-PLAN
-[PLAN] PR #17100: RFC for new disaggregated prefill API
-  Impact: llm-d routing logic depends on the current prefill interface.
-  Runway: Targeting v0.9.0, likely 6-8 weeks out.
-  Action: Review RFC and comment on our requirements by July 10.
-
-WATCH
-- PR #17234: Multi-LoRA batching improvements - performance gain, no
-  API changes
-- PR #17301: Async engine shutdown refactor - cleaner cleanup, no
-  behavior change
-
-Quick Reference
-| Category              | Status                    |
-|-----------------------|---------------------------|
-| Latest release        | v0.8.2 (2026-06-15)      |
-| PRs merged (7d)       | 34                        |
-| Threats detected (14d)| 1 ACT NOW, 1 PLAN        |
-| Open proposals        | 3                         |
-| Overall threat level  | ACT NOW                   |
-```
+Every report follows this pattern. Specific. Traceable. Actionable.
 
 ## Tracked Projects
 
-| Project | Repository | Why We Care |
-|---------|-----------|-------------|
+| Project | Repository | Why we track it |
+|---------|-----------|-----------------|
 | vLLM | vllm-project/vllm | Core inference engine for LLM serving |
 | llm-d | llm-d/llm-d | Distributed LLM serving, scalability pillar focus |
 | KServe | kserve/kserve | Model serving framework on OpenShift AI |
@@ -131,29 +130,10 @@ Quick Reference
 
 See [reference/key-upstreams.md](reference/key-upstreams.md) for detailed information on each project including key maintainers, critical code areas, and downstream ownership.
 
-## Installation
-
-```bash
-git clone https://github.com/MarkellR-RedHat/ai-bu-upstream-tracker.git
-cd ai-bu-upstream-tracker
-chmod +x install.sh
-./install.sh
-```
-
-This copies the command files to `~/.claude/commands/` so they are available as slash commands in Claude Code.
-
-### Prerequisites
+## Prerequisites
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) installed
 - GitHub CLI (`gh`) installed and authenticated (the commands use `gh api` and `gh pr list` to fetch live data)
-
-### Quick Start
-
-```
-/upstream-breaking
-```
-
-This scans all 10 tracked projects for breaking changes in the last 14 days. If something needs your attention, you will know in under a minute.
 
 ## Adding a New Project
 
@@ -204,26 +184,6 @@ Every command follows the same analysis pattern:
 5. Prescribe specific actions
 
 The commands include calibration examples and self-critique checklists to prevent common failures like crying wolf, listing activity without context, or recommending vague "monitoring."
-
-## Project Structure
-
-```
-ai-bu-upstream-tracker/
-  commands/               # Slash command definitions (threat detection prompts)
-    upstream.md           # Single project threat assessment
-    upstream-weekly.md    # Weekly threat briefing across all projects
-    upstream-breaking.md  # Breaking changes threat sweep
-    upstream-impact.md    # Blast radius analysis of specific changes
-    upstream-migration.md # Field upgrade playbook generator
-    upstream-health.md    # Dependency risk assessment
-    upstream-forecast.md  # Forward-looking intelligence
-    upstream-contributor.md  # Contributor power map
-    upstream-opportunity.md  # Strategic contribution targets
-  projects/               # Project definitions (what we track and why)
-  reference/              # Reference material
-    key-upstreams.md      # Key upstream projects for AI BU
-  install.sh              # Install commands to ~/.claude/commands/
-```
 
 ## Limitations
 
